@@ -2,9 +2,9 @@ import tkinter as tk
 import sqlite3 as sq
 
 
-conexion = sq.connect("./data/database.db")     # Conexión con la base de datos
-cursor = conexion.cursor()      # Creación de la variable para ejecutar comandos
-# Ejecución de código sqlite3
+connection = sq.connect("./data/database.db")     # Connect to the database
+cursor = connection.cursor()      # Create a cursor to execute commands
+# Execute SQLite code
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS tareas(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,67 +13,67 @@ CREATE TABLE IF NOT EXISTS tareas(
     prioridad TEXT,
     estado TEXT)
 """)
-conexion.commit()   # Hacer commit de los cambios de la database
+connection.commit()   # Commit the database changes
 
-# Función para mostrar las tareas
-def mostrarTareas():
-    espacioMostrar.delete(0, tk.END)
+# Function to display tasks
+def showTasks():
+    taskList.delete(0, tk.END)
 
     cursor.execute("SELECT titulo, descripcion, prioridad, estado FROM tareas")
-    resultado = cursor.fetchall()
+    results = cursor.fetchall()
 
-    for tarea in resultado:
-        texto = f"{tarea[0]} | {tarea[1]} | {tarea[2]} | {tarea[3]}"
-        espacioMostrar.insert(tk.END, texto)
+    for task in results:
+        text = f"{task[0]} | {task[1]} | {task[2]} | {task[3]}"
+        taskList.insert(tk.END, text)
 
 
-# Función para guardar los datos en la database
-def guardarDatos():
-    nombreTarea = nombre.get()
-    descripcionTarea = descripcion.get()
-    prioridadTarea = prioridadVar.get()
-    if (nombreTarea.strip() and descripcionTarea.strip() and prioridadTarea.strip()):
+# Function to save task data to the database
+def saveTaskData():
+    taskName = name.get()
+    taskDescription = description.get()
+    taskPriority = priorityVar.get()
+    if (taskName.strip() and taskDescription.strip() and taskPriority.strip()):
 
         cursor.execute("""
         INSERT INTO tareas (titulo, descripcion, prioridad, estado)
         VALUES (?, ?, ?, 'pendiente')
         """,
-        (nombreTarea, descripcionTarea, prioridadTarea)),
-        conexion.commit()
+        (taskName, taskDescription, taskPriority)),
+        connection.commit()
 
-        mostrarTareas()
+        showTasks()
 
-ventana = tk.Tk()
+window = tk.Tk()
 
-# Introducir título de una tarea
-labelNombre = tk.Label(ventana, text="Nombre")
-labelNombre.pack()
-nombre = tk.Entry()
-nombre.pack()
+# Enter a task title
+nameLabel = tk.Label(window, text="Nombre")
+nameLabel.pack()
+name = tk.Entry()
+name.pack()
 
-# Introducir descripción de la tarea
-labelDescripcion = tk.Label(ventana, text="Descripcion")
-labelDescripcion.pack()
-descripcion = tk.Entry()
-descripcion.pack()
+# Enter a task description
+descriptionLabel = tk.Label(window, text="Descripcion")
+descriptionLabel.pack()
+description = tk.Entry()
+description.pack()
 
-# Seleccionar prioridad
-prioridadVar = tk.StringVar()
-prioridadVar.set("Media")
+# Select a priority
+priorityVar = tk.StringVar()
+priorityVar.set("Media")
 
-labelPrioridad = tk.Label(ventana, text="Prioridad")
-labelPrioridad.pack()
-prioridad = tk.OptionMenu(ventana, prioridadVar, "Alta", "Media", "Baja")
-prioridad.pack()
+priorityLabel = tk.Label(window, text="Prioridad")
+priorityLabel.pack()
+priorityMenu = tk.OptionMenu(window, priorityVar, "Alta", "Media", "Baja")
+priorityMenu.pack()
 
-# Botón para guardar
-boton = tk.Button(ventana, text="Guardar Tarea", command=guardarDatos)
-boton.pack()
+# Save button
+saveButton = tk.Button(window, text="Guardar Tarea", command=saveTaskData)
+saveButton.pack()
 
-# Mostrar las tareas
-espacioMostrar = tk.Listbox(ventana, width=60)
-espacioMostrar.pack()
+# Display tasks
+taskList = tk.Listbox(window, width=60)
+taskList.pack()
 
 
-mostrarTareas()
-ventana.mainloop()
+showTasks()
+window.mainloop()
