@@ -1,5 +1,6 @@
 import tkinter as tk
 import sqlite3 as sq
+from tkinter import messagebox
 
 
 connection = sq.connect("./data/database.db")     # Connect to the database
@@ -42,6 +43,29 @@ def saveTaskData():
         connection.commit()
 
         showTasks()
+    else:
+        messagebox.showwarning("Alerta!", "La nota no puede tener título o descripción vacía.")
+
+
+# Function to get select element
+def getElement():
+    try:
+        index = taskList.curselection()[0]
+        value = taskList.get(index)
+        return value
+
+    except IndexError:
+        messagebox.showwarning("Alerta!", "Seleccione un elemento")
+
+
+# Function to update task data to the database
+def updateTaskData():
+    cursor.execute("""SELECT * FROM tareas""")
+    value = getElement()
+    if (value != None):
+        vaca = cursor.execute("""SELECT * FROM tareas""")
+        print(vaca)
+
 
 window = tk.Tk()
 
@@ -69,6 +93,10 @@ priorityMenu.pack()
 # Save button
 saveButton = tk.Button(window, text="Guardar Tarea", command=saveTaskData)
 saveButton.pack()
+
+# Update button
+updateButton = tk.Button(window, text="Actualizar Tarea", command=updateTaskData)
+updateButton.pack()
 
 # Display tasks
 taskList = tk.Listbox(window, width=60)
